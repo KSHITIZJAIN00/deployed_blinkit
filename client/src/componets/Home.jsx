@@ -113,7 +113,7 @@ const Home = () => {
         <div className="left-section">
           <Link to="/">
             <img
-              src={logo || "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Screenshot%202025-01-30%20014847-oJHYLXI7YuDgJdhet6UUtxhnZnr56z.png"}
+              src={logo}
               alt="Blinkit Logo"
               className="logo"
             />
