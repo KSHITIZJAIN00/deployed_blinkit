@@ -18,40 +18,39 @@ const Login = () => {
     };
   }, []);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const response = await axios.post("http://localhost:8080/api/auth/login", {
-        email,
-        password,
-      });
-  
-      // Log the full response to see the structure
-      console.log("Response from server:", response.data);
-  
-      setMessage(response.data.message);
-  
-      if (response.status === 200) {
-        if (response.data.user) {
-          const { isAdmin, email } = response.data.user;
-      
-          // Store the isAdmin flag and email in localStorage
-          localStorage.setItem("isAdmin", isAdmin);
-          localStorage.setItem("email", email);
-      
-          // Redirect the user after successful login
-          navigate("/");  // Redirect to the homepage or a protected route
-        } else {
-          setMessage("User data not found in the response");
-        }
-      }
-      
-    } catch (error) {
-      console.error("Error during login:", error);
-      setMessage(error.response?.data?.message || "An error occurred");
+ const handleSubmit = async (e) => {
+  e.preventDefault();
+  try {
+    const response = await axios.post("http://localhost:8080/api/auth/login", {
+      email,
+      password,
+    });
+
+    console.log("Response from server:", response.data);
+    setMessage(response.data.message);
+
+    if (response.status === 200 && response.data.user) {
+      const { isAdmin, email } = response.data.user;
+
+      // Save to localStorage
+      localStorage.setItem("isAdmin", isAdmin);
+      localStorage.setItem("email", email);
+
+      // Extract and save username
+      const username = email.split("@")[0].replace(/[0-9]/g, "").split(/[.\-_]/)[0];
+      localStorage.setItem("username", username);
+
+      // Redirect
+      navigate("/");
+    } else {
+      setMessage("User data not found in the response");
     }
-  };
-  
+  } catch (error) {
+    console.error("Error during login:", error);
+    setMessage(error.response?.data?.message || "An error occurred");
+  }
+};
+
   
   return (
     <div className="login-page">

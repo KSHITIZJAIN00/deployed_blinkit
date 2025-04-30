@@ -86,7 +86,12 @@ export default function OrderPlaced() {
   }
 
   const handleTrackOrder = () => {
-    navigate("/track-order")
+    if (orderDetails && orderDetails.orderId) {
+      // Navigate to track order page with the orderId
+      navigate(`/track-order/${orderDetails.orderId}`);
+    } else {
+      console.error("Order ID is missing");
+    }
   }
 
   const downloadInvoice = () => {
@@ -224,69 +229,14 @@ export default function OrderPlaced() {
             ))}
           </div>
 
-          <button className="track-order-btn" onClick={handleTrackOrder}>
-            Track Your Order
-          </button>
-
-          {orderDetails && userDetails && (
-            <div className="invoice-container mt-8 max-w-2xl mx-auto bg-white p-8 rounded-lg shadow-md">
-              <div className="flex justify-between items-start mb-8">
-                <h1 className="text-4xl font-bold">INVOICE</h1>
-                <div className="text-right">
-                  <h2 className="text-xl text-red-500">
-                    {userDetails.firstName} {userDetails.lastName}
-                  </h2>
-                  <p className="text-gray-600">{userDetails.email}</p>
-                </div>
-              </div>
-
-              <div className="mb-6">
-                <p>
-                  <span className="font-semibold">BILLED:</span> {userDetails.firstName} {userDetails.lastName}
-                </p>
-                <p>
-                   <span className="font-semibold">ADDRESS:</span> {userDetails.address}
-                </p>
-                <p>
-                  <span className="font-semibold">DATE:</span> {orderDetails.date}
-                </p>
-                <p>
-                  <span className="font-semibold">ORDER ID:</span> {orderDetails.orderId}
-                </p>
-              </div>
-
-              <table className="w-full mb-6">
-                <thead>
-                  <tr className="border-b">
-                    <th className="text-left py-2">Product</th>
-                    <th className="text-left py-2">Unit</th>
-                    <th className="text-left py-2">Price</th>
-                    <th className="text-left py-2">Total</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {cart.map((item, index) => (
-                    <tr key={index} className="border-b">
-                      <td className="py-2">{item.name}</td>
-                      <td className="py-2">{item.quantity}</td>
-                      <td className="py-2">₹{item.price}</td>
-                      <td className="py-2">₹{(item.price * item.quantity).toFixed(2)}</td>
-                    </tr>
-                  ))}
-                  <tr>
-                    <td colSpan={3} className="text-right py-4 font-semibold">
-                      Total
-                    </td>
-                    <td className="py-4">₹{orderDetails.total.grandTotal.toFixed(2)}</td>
-                  </tr>
-                </tbody>
-              </table>
-
-              <button className="but" onClick={downloadInvoice}>
-                Download Invoice
-              </button>
-            </div>
-          )}
+          <div className="track-order-container">
+            <button className="track-order-button" onClick={handleTrackOrder}>
+              Track Your Order
+            </button>
+            <button className="download-invoice-button" onClick={downloadInvoice}>
+              Download Invoice
+            </button>
+          </div>
         </div>
       </main>
     </div>

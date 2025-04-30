@@ -15,9 +15,15 @@ const Home = () => {
   const navigate = useNavigate();
   const [products, setProducts] = useState([]);
   const [cart, setCart] = useState(() => {
-    const savedCart = localStorage.getItem("cart");
-    return savedCart ? JSON.parse(savedCart) : [];
+    const storedUsername = localStorage.getItem("username");
+    if (storedUsername) {
+      // Retrieve the cart for the current user using their username
+      const savedCart = localStorage.getItem(`${storedUsername}_cart`);
+      return savedCart ? JSON.parse(savedCart) : [];
+    }
+    return [];
   });
+  
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -52,6 +58,14 @@ const Home = () => {
     }
   }, []);
 
+  useEffect(() => {
+    if (username) {
+      // Store the cart for the specific user in localStorage under their username
+      localStorage.setItem(`${username}_cart`, JSON.stringify(cart));
+    }
+  }, [cart, username]);
+  
+  
   useEffect(() => {
     if (showConfirmation) {
       const timer = setTimeout(() => {

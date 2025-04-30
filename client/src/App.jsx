@@ -8,6 +8,7 @@ import AddCategory from "./componets/add-category";
 import AddSubCategory from "./componets/add-sub";
 import Cheak from "./componets/cheakout";
 import Order from "./componets/OrderPlaced";
+import TrackOrder from "./componets/TrackOrder";
 
 import "./App.css";
 
@@ -31,7 +32,7 @@ function App() {
             <Route path="/add-subcategory" element={<AddSubCategory />} />
           </>
         )}
-
+         <Route path="/track-order/:orderId" element={<TrackOrder />} />
         <Route path="/checkout" element={<Cheak />} /> {/* Fixed typo here */}
         <Route path="/order" element={<Order />} />
       </Routes>

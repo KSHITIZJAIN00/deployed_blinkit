@@ -15,63 +15,71 @@ export default function Checkout() {
   const [paymentSuccessful, setPaymentSuccessful] = useState(false);
   const continueButtonRef = useRef(null); 
   const [username, setUsername] = useState("");
+
+  const sanitizeString = (str) => {
+    // Remove emojis and special characters
+    return str.replace(/[^\w\s]/gi, '').trim();
+  };
   
   const handleRazorpayPayment = async () => {
     if (!formData.firstName || !formData.lastName || !formData.address || !formData.city) {
-      setShowAlert(true); // Show the alert if shipping details are not filled
-      setTimeout(() => {
-        setShowAlert(false); // Hide the alert after 2 seconds
-      }, 2000);
+      setShowAlert(true);
+      setTimeout(() => setShowAlert(false), 2000);
       return;
     }
-    
-    try {
-      // Get the total amount from localStorage
-      const totalAmount = JSON.parse(localStorage.getItem("total"))?.total;
   
-      if (!totalAmount) {
-        throw new Error("Total amount is not available");
+    try {
+      const orderData = JSON.parse(localStorage.getItem("total"));
+      if (!orderData || typeof orderData.total !== "number") {
+        throw new Error("Total amount is not available in localStorage");
       }
   
-      // Multiply the amount by 100 to convert from rupees to paise
-      const amountInPaise = totalAmount*100;
+      const totalAmountInRupees = orderData.total;
+      const amountInPaise = totalAmountInRupees * 100; // Convert to paise
+   
   
-      const response = await fetch("http://localhost:8080/api/payment/create-order", {
+      // Validate Razorpay API Key
+      const razorpayKey = import.meta.env.VITE_RAZORPAY_KEY_ID;
+      if (!razorpayKey) {
+        throw new Error("Razorpay API Key is not set properly");
+      }
+  
+  
+      const response = await fetch("http://localhost:8080/api/payment/razor", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ amount: amountInPaise }), // Send the amount in paise
+        body: JSON.stringify({ amount: amountInPaise }),
+        
       });
   
-      if (!response.ok) {
-        throw new Error("Failed to create order");
-      }
+      if (!response.ok) throw new Error("Failed to create order");
   
       const data = await response.json();
       console.log("Order Data:", data);
   
       const options = {
-        key: "rzp_test_Kc1m9qMZii4I8x", // Replace with your Razorpay key
-        amount: data.order.amount, // Razorpay expects the amount in paise
+        key: razorpayKey,
+        amount: data.order.amount,
         currency: "INR",
-        name: "BLINKIT",
+        name: sanitizeString(formData.firstName),
         description: "Test Transaction",
         order_id: data.order.id,
         handler: function (response) {
           if (formData.firstName && formData.lastName && formData.address && formData.city) {
-            // Simulate a click on the "Continue to Shipping" button without reloading the page
             if (continueButtonRef.current) {
-              continueButtonRef.current.click(); // Trigger the button click
+              continueButtonRef.current.click();
             }
           }
+          
           navigate("/order");
-          setPaymentSuccessful(true); 
+          setPaymentSuccessful(true);
         },
         prefill: {
-          name: formData.firstName,
-          email: formData.firstName,
-          contact: formData.phone,
+          name: sanitizeString(formData.firstName),
+          email: formData.email || "test@example.com",
+          contact: formData.phone || "9999999999",
         },
         theme: {
           color: "#3399cc",
@@ -81,11 +89,9 @@ export default function Checkout() {
       const rzp = new window.Razorpay(options);
       rzp.open();
     } catch (error) {
-      console.error("Payment failed:", error);
+      console.error("Payment failed:", error.message || error);
     }
   };
-  
-  
   
   
   const [formData, setFormData] = useState(() => {

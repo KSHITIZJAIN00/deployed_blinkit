@@ -3,6 +3,7 @@ body {
   font-family: "Poppins", sans-serif;
   background-color: #f5f5f5;
 }
+
 .header {
   display: grid;
   grid-template-columns: auto 1fr auto;
@@ -26,7 +27,7 @@ body {
 }
 
 .logo {
-  height: 100px; /* Significantly increased logo size */
+  height: 120px !important; /* Slightly larger logo size */
   width: auto;
 }
 
@@ -50,6 +51,8 @@ body {
   justify-self: center;
   width: 100%;
   max-width: 600px;
+  display: flex;
+  justify-content: center; /* Center the search bar */
 }
 
 .search-bar input {
@@ -62,6 +65,7 @@ body {
   background-color: #f8f8f8;
   transition: all 0.2s ease;
 }
+
 .header-actions {
   display: flex;
   align-items: center;
@@ -127,8 +131,6 @@ body {
   width: 20px;
   height: 20px;
 }
-
-
 
 /* Banner Section */
 .main-content {
@@ -306,17 +308,15 @@ body {
   color: white !important;
   border: 1.5px solid #26a967 !important;
 }
-
-/* Cart Section */
 .cart-container {
   position: fixed;
-  top: 0;
+  top: 150px; /* Adjust this value to make the cart appear lower than the header */
   right: 0;
   width: 300px;
-  height: 100%;
+  height: calc(100% - 120px); /* Adjust the height to fill the remaining space below the header */
   background: white;
   box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
-  transform: translateX(100%);
+  transform: translateX(100%); /* Starts off-screen */
   transition: transform 0.3s ease-in-out;
   overflow-y: auto;
   display: flex;
@@ -336,8 +336,6 @@ body {
   max-height: 110%;
   object-fit: contain;
 }
-
-
 
 .cart-container.open {
   transform: translateX(0);
@@ -518,10 +516,11 @@ body {
     max-width: none;
   }
 }
+
 .home-page.blurred .main-content,
 .home-page.blurred .cart-container {
-  filter: blur(10px); /* Apply blur effect */
-  pointer-events: none; /* Disable interaction with blurred elements */
+  filter: blur(10px);
+  pointer-events: none;
 }
 
 .confirmation-popup {
@@ -529,70 +528,39 @@ body {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background: white !important;/* Slightly transparent background */
+  background: white !important;
   padding: 20px;
   border-radius: 10px;
-  z-index: 1000; /* Ensure it is above everything else */
+  z-index: 1000;
   display: flex;
   align-items: center;
   justify-content: center;
 }
-/* Flexbox layout to align items properly */
-
 
 .confirmation-gifs {
   width: 450px !important;
   height: auto;
-  filter: none; /* Keep the GIF clear without blur */
+  filter: none;
 }
-/* Control button styles */
+
 .control-button {
-  background-color: #28a745; /* Attractive green color */
+  background-color: #28a745;
   color: white;
   padding: 10px 20px;
-  border-radius: 25px; /* Rounded corners for a sleek look */
-  font-size: 14px; /* Smaller text size */
-  font-weight: bold;
-  border: none;
+  border-radius: 25px;
+  font-size: 14px;
+  margin-top: 20px;
   cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.3s ease;
-  margin-top: 10px; /* Add some space around the button */
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
 }
 
-.control-button:hover {
-  background-color: #218838; /* Slightly darker green when hovered */
-  transform: scale(1.05); /* Slight scale-up effect on hover */
+.confirmation-popup p {
+  font-weight: 500;
+  font-size: 16px;
+  margin-bottom: 0;
 }
 
-.control-button:focus {
-  outline: none; /* Removes default focus outline */
-}
-
-/* Optional: Style for the button when clicked */
-.control-button:active {
-  transform: scale(0.98); /* Shrink effect on click */
-}
-
-@media (max-width: 480px) {
-  .product-cards {
-    grid-template-columns: 1fr;
-  }
-
-  .header {
-    flex-wrap: wrap;
-    height: auto;
-    padding: 10px;
-  }
-
-  .search-bar {
-    order: 3;
-    width: 100%;
-    margin: 10px 0;
-  }
-
-  .header-actions {
-    width: 100%;
-    justify-content: space-between;
-  }
+.confirmation-popup .actions {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
 }
