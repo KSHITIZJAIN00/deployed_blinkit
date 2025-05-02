@@ -9,6 +9,7 @@ import AddSubCategory from "./componets/add-sub";
 import Cheak from "./componets/cheakout";
 import Order from "./componets/OrderPlaced";
 import TrackOrder from "./componets/TrackOrder";
+import Orders from "./componets/Orders";
 
 import "./App.css";
 
@@ -30,6 +31,7 @@ function App() {
             <Route path="/add" element={<AddProduct />} />
             <Route path="/add-category" element={<AddCategory />} />
             <Route path="/add-subcategory" element={<AddSubCategory />} />
+            <Route path="/orders" element={<Orders />} /> 
           </>
         )}
          <Route path="/track-order/:orderId" element={<TrackOrder />} />
