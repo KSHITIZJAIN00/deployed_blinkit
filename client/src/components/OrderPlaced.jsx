@@ -72,27 +72,31 @@ export default function OrderPlaced() {
   }, []);
   
   useEffect(() => {
-    if (orderDetails && userDetails) {
-      fetch("http://localhost:8080/api/orders", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          user: `${userDetails.firstName} ${userDetails.lastName}`,
-          email: userDetails.email,
-          address: userDetails.address,
-          items: cart,
-          total: orderDetails.total,
-          orderId: orderDetails.orderId,
-          date: orderDetails.date,
-        }),
-      })
-      .then(res => res.json())
-      .then(data => console.log("Order sent to admin:", data))
-      .catch(err => console.error("Failed to notify admin:", err));
-    }
-  }, [orderDetails, userDetails]);
+  if (orderDetails && userDetails) {
+    fetch("http://localhost:8080/api/orders", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        user: `${userDetails.firstName} ${userDetails.lastName}`,
+        email: userDetails.email,
+        address: userDetails.address,
+        items: cart,
+        total: orderDetails.total,
+        orderId: orderDetails.orderId,
+        date: orderDetails.date,
+      }),
+    })
+    .then(res => res.json())
+    .then(data => {
+      console.log("Order sent to admin:", data);
+      localStorage.setItem("orderPlaced", "true"); // ✅ Set flag
+    })
+    .catch(err => console.error("Failed to notify admin:", err));
+  }
+}, [orderDetails, userDetails]);
+
   
   // Update cart and orderDetails in localStorage when they change
   useEffect(() => {
@@ -111,7 +115,7 @@ export default function OrderPlaced() {
   const handleTrackOrder = () => {
     if (orderDetails && orderDetails.orderId) {
       // Navigate to track order page with the orderId
-      navigate(`/track-order/${orderDetails.orderId}`);
+      navigate(`/track/123`);
     } else {
       console.error("Order ID is missing");
     }

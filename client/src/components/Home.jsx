@@ -58,12 +58,25 @@ const Home = () => {
     }
   }, []);
 
+  
   useEffect(() => {
-    if (username) {
-      // Store the cart for the specific user in localStorage under their username
-      localStorage.setItem(`${username}_cart`, JSON.stringify(cart));
+  const storedUsername = localStorage.getItem("username");
+  const orderPlaced = localStorage.getItem("orderPlaced");
+
+  if (storedUsername) {
+    const savedCart = localStorage.getItem(`${storedUsername}_cart`);
+
+    // ✅ If order was placed, clear cart
+    if (orderPlaced === "true") {
+      setCart([]);
+      localStorage.removeItem(`${storedUsername}_cart`);
+      localStorage.setItem("orderPlaced", "false"); // Reset the flag
+    } else {
+      setCart(savedCart ? JSON.parse(savedCart) : []);
     }
-  }, [cart, username]);
+  }
+}, []);
+
   
   
   useEffect(() => {
@@ -166,7 +179,7 @@ const Home = () => {
 
           {isAdmin && (
             <div className="admin-actions">
-              <button className="control-button" onClick={() => navigate("/add-category")}>
+              <button  type="button" className="control-button" onClick={() => navigate("/add-category")}>
                 Control
               </button>
             </div>
@@ -174,7 +187,7 @@ const Home = () => {
 
         </div>
       </header>
-
+ 
       <main className="main-content">
         <img src={banner || "/placeholder.svg"} alt="Banner" className="banner" />
 

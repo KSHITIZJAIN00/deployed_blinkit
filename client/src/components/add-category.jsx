@@ -6,6 +6,7 @@ import wideAssortment from "../assets/Wide_Assortment.png";
 import "./add-category.css";
 
 const AddCategory = () => {
+  const isAdmin = localStorage.getItem("isAdmin") === "true"; // or check for role === 'admin'
   const [categories, setCategories] = useState([]);
   const [categoryData, setCategoryData] = useState({
     name: "",
@@ -96,15 +97,18 @@ const AddCategory = () => {
         <div className="search-bar">
           <input type="text" placeholder="Search 'groceries'" />
         </div>
-        <div className="header-actions">
-          <button className="cart-button">
-            <img src={cart} alt="Cart" />
-            My Cart
-          </button>
-          <Link to="/add" className="add-product-icon">
-            <img src={wideAssortment} alt="Wide Assortment" className="wide-assortment" />
-          </Link>
-        </div>
+       <div className="header-actions">
+  {!isAdmin && (
+    <button className="cart-button">
+      <img src={cart} alt="Cart" />
+      My Cart
+    </button>
+  )}
+  <Link to="/add" className="add-product-icon">
+    <img src={wideAssortment} alt="Wide Assortment" className="wide-assortment" />
+  </Link>
+</div>
+
       </header>
 
       <div className="content">

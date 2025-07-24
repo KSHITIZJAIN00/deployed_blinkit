@@ -41,7 +41,7 @@ const Login = () => {
       localStorage.setItem("username", username);
 
       // Redirect
-      navigate("/");
+      navigate("/home");
     } else {
       setMessage("User data not found in the response");
     }
