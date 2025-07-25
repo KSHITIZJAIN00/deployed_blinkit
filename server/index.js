@@ -5,7 +5,7 @@ import cookieParser from 'cookie-parser';
 import morgan from 'morgan';
 import helmet from 'helmet';
 import http from "http";
-import { Server } from "socket.io"; // ✅ import Socket.IO server
+import { Server } from "socket.io";
 
 import connectDB from './config/connectDB.js';
 import authRoutes from './routes/authRoutes.js';
@@ -18,7 +18,7 @@ import orderRoutes from './routes/orderRoutes.js';
 dotenv.config();
 
 const app = express();
-const server = http.createServer(app); // ✅ wrap app in HTTP server
+const server = http.createServer(app);
 
 // ✅ initialize socket.io server
 const io = new Server(server, {
@@ -31,14 +31,13 @@ const io = new Server(server, {
   },
 });
 
-
 // ✅ SOCKET.IO event handling
 io.on("connection", (socket) => {
   console.log("Client connected");
 
   socket.on("send-location", (data) => {
     console.log("Location received:", data);
-    io.emit("receive-location", data); // Broadcast location to all clients
+    io.emit("receive-location", data);
   });
 
   socket.on("disconnect", () => {
@@ -51,7 +50,9 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(
   cors({
-    origin: ["http://localhost:5173", "http://localhost:5174"],
+    origin: (origin, callback) => {
+      callback(null, origin || "*");
+    },
     credentials: true,
   })
 );
@@ -73,7 +74,6 @@ app.use('/api/orders', orderRoutes);
 const PORT = process.env.PORT || 8080;
 
 connectDB().then(() => {
-  // ✅ start the HTTP server, not app.listen
   server.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
   });
