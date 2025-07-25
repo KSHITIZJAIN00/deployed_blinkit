@@ -33,7 +33,7 @@ const Home = () => {
   const [isAdmin, setIsAdmin] = useState(false); // Admin state
 
   useEffect(() => {
-    fetch("http://localhost:8080/api/products")
+  fetch("https://deployed-blinkit-backend.onrender.com/api/products")
       .then((response) => response.json())
       .then((data) => {
         setProducts(data);
@@ -91,7 +91,7 @@ const Home = () => {
   }, [showConfirmation, navigate]);
 
   useEffect(() => {
-    fetch("http://localhost:8080/api/categories")
+    fetch("https://deployed-blinkit-backend.onrender.com/api/categories")
       .then((response) => response.json())
       .then((data) => {
         setCategories(data);
