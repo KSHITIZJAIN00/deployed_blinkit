@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import cartIcon from "../assets/cart.png";
@@ -18,7 +17,7 @@ const CategoryPage = ({ username, isAdmin, setIsCartOpen, calculateTotal, addToC
   useEffect(() => {
     const fetchCategoryData = async () => {
       try {
-        const res = await fetch(`http://localhost:8080/api/category/${categoryId}/details`);
+        const res = await fetch(`https://deployed-blinkit-backend.onrender.com/api/category/${categoryId}/details`);
         const text = await res.text();
 
         if (text.startsWith("<!DOCTYPE html")) {
@@ -106,15 +105,14 @@ const CategoryPage = ({ username, isAdmin, setIsCartOpen, calculateTotal, addToC
             {products.map((product) => (
               <div key={product._id} className="product-card">
                 <img
-  src={
-    product.image?.data
-      ? `data:${product.image.contentType};base64,${product.image.data}`
-      : "/placeholder.svg"
-  }
-  alt={product.name}
-  className="product-image"
-/>
-
+                  src={
+                    product.image?.data
+                      ? `data:${product.image.contentType};base64,${product.image.data}`
+                      : "/placeholder.svg"
+                  }
+                  alt={product.name}
+                  className="product-image"
+                />
 
                 <p className="product-name">{product.name}</p>
                 <p className="product-description">{product.description}</p>
