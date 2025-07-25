@@ -40,7 +40,7 @@ function App() {
         )}
 
         {/* Other routes */}
-        <Route path="/track-order/:orderId" element={<TrackOrder />} />
+        <Route path="/track-order/123" element={<TrackOrder />} />
         <Route path="/checkout" element={<Cheak />} />
         <Route path="/order" element={<Order />} />
       </Routes>
