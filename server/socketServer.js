@@ -6,7 +6,10 @@ let io;
 export const initSocketServer = (httpServer) => {
   io = new Server(httpServer, {
     cors: {
-      origin: ["http://localhost:5173", "http://localhost:5174"], // Frontend URLs
+      origin: (origin, callback) => {
+        // Allow all origins dynamically
+        callback(null, origin || "*");
+      },
       credentials: true,
     },
   });
