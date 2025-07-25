@@ -7,7 +7,7 @@ import arrivedImg from "../assets/order.webp";
 import tickIcon from "../assets/tick.png";
 import "./TrackOrder.css";
 
-const socket = io("http://localhost:8080");
+const socket = io("https://deployed-blinkit-backend.onrender.com");
 
 const TrackOrder = () => {
   const mapContainerRef = useRef(null);
