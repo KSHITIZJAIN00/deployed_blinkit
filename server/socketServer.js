@@ -4,11 +4,20 @@ import { Server } from "socket.io";
 let io;
 
 export const initSocketServer = (httpServer) => {
+  const allowedOrigins = [
+    "https://blinkify-kj7a.onrender.com", // Deployed frontend
+    "http://localhost:5173",              // Local Vite dev
+  ];
+
   io = new Server(httpServer, {
     cors: {
       origin: (origin, callback) => {
-        // Allow all origins dynamically
-        callback(null, origin || "*");
+        // Allow specific origins or requests with no origin (mobile apps, curl)
+        if (!origin || allowedOrigins.includes(origin)) {
+          callback(null, true);
+        } else {
+          callback(new Error("Not allowed by CORS"));
+        }
       },
       credentials: true,
     },
@@ -19,7 +28,14 @@ export const initSocketServer = (httpServer) => {
 
     socket.on("send-location", (data) => {
       const { orderId, latitude, longitude } = data;
-      io.emit("recived-location", { id: socket.id, orderId, latitude, longitude });
+
+      // Broadcast the location to all clients
+      io.emit("receive-location", { 
+        id: socket.id, 
+        orderId, 
+        latitude, 
+        longitude 
+      });
     });
 
     socket.on("disconnect", () => {
@@ -27,4 +43,9 @@ export const initSocketServer = (httpServer) => {
       io.emit("user-disconnect", socket.id);
     });
   });
+};
+
+export const getIO = () => {
+  if (!io) throw new Error("Socket.io has not been initialized!");
+  return io;
 };
