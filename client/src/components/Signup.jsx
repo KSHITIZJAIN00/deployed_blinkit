@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import "./Login.css";
+import "./login.css";
 import logo from "../assets/blinkit-logo.png";
 import cart from "../assets/cart.png";
 
