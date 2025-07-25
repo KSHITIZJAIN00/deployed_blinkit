@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import "./login.css";
 import logo from "../assets/blinkit-logo.png";
 import cart from "../assets/cart.png";
@@ -106,7 +106,7 @@ const Login = () => {
         </form>
         <p>{message}</p>
         <p>
-          Don't have an account? <a href="/signup">Sign up</a>
+          Don't have an account? <Link to="/signup">Sign up</Link>
         </p>
       </div>
     </div>
@@ -114,4 +114,3 @@ const Login = () => {
 };
 
 export default Login;
-
