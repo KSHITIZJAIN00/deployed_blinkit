@@ -19,16 +19,25 @@ function App() {
   return (
     <Router>
       <Routes>
-        {/* Default route: If not logged in, go to login */}
-        <Route path="/" element={isLoggedIn ? <Navigate to="/home" /> : <Navigate to="/login" />} />
+        {/* Redirect root path */}
+        <Route
+          path="/"
+          element={
+            isLoggedIn ? <Navigate to="/home" /> : <Navigate to="/login" />
+          }
+        />
 
+        {/* Public routes */}
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
 
         {/* Protected home route */}
-        <Route path="/home" element={isLoggedIn ? <Home /> : <Navigate to="/login" />} />
+        <Route
+          path="/home"
+          element={isLoggedIn ? <Home /> : <Navigate to="/login" />}
+        />
 
-        {/* Admin Routes (only accessible if admin) */}
+        {/* Admin Routes */}
         {isAdmin && (
           <>
             <Route path="/admin" element={<Admin />} />
@@ -48,4 +57,3 @@ function App() {
 }
 
 export default App;
-
