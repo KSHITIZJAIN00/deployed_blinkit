@@ -20,13 +20,13 @@ dotenv.config();
 const app = express();
 const server = http.createServer(app);
 
-// === ALLOWED ORIGINS ===
+// === ALLOWED ORIGINS (FRONTEND URLs) ===
 const allowedOrigins = [
-  "https://blinkify-kj7a.onrender.com", // frontend on Render
-  "http://localhost:5173",              // Vite dev server
+  "https://blinkify-kj7a.onrender.com", // deployed frontend on Render
+  "http://localhost:5173",              // local Vite dev server
 ];
 
-// === SOCKET.IO SETUP ===
+// === SOCKET.IO SETUP WITH SAME CORS ===
 const io = new Server(server, {
   cors: {
     origin: allowedOrigins,
@@ -35,6 +35,7 @@ const io = new Server(server, {
   },
 });
 
+// === SOCKET.IO EVENTS ===
 io.on("connection", (socket) => {
   console.log("Client connected");
 
@@ -48,14 +49,14 @@ io.on("connection", (socket) => {
   });
 });
 
-// === MIDDLEWARE ===
+// === EXPRESS MIDDLEWARE ===
 app.use(express.json());
 app.use(cookieParser());
 
 app.use(
   cors({
     origin: function (origin, callback) {
-      // allow requests with no origin (like mobile apps or curl)
+      // allow requests with no origin (curl, mobile)
       if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
@@ -67,7 +68,6 @@ app.use(
 );
 
 app.use(morgan("dev"));
-
 app.use(
   helmet({
     crossOriginResourcePolicy: false,
