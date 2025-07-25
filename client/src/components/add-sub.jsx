@@ -5,6 +5,9 @@ import cart from "../assets/cart.png";
 import wideAssortment from "../assets/Wide_Assortment.png";
 import "./add-sub.css";
 
+// Centralized backend URL
+const BASE_URL = "https://deployed-blinkit-backend.onrender.com";
+
 const AddSubCategory = () => {
   const [categories, setCategories] = useState([]);
   const [subCategories, setSubCategories] = useState([]);
@@ -23,7 +26,7 @@ const AddSubCategory = () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await fetch("http://localhost:8080/api/categories");
+      const response = await fetch(`${BASE_URL}/api/categories`);
       const data = await response.json();
       setCategories(data);
     } catch (error) {
@@ -33,7 +36,7 @@ const AddSubCategory = () => {
 
   const fetchSubCategories = async () => {
     try {
-      const response = await fetch("http://localhost:8080/api/subcategories");
+      const response = await fetch(`${BASE_URL}/api/subcategories`);
       const data = await response.json();
       setSubCategories(data);
     } catch (error) {
@@ -67,7 +70,7 @@ const AddSubCategory = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetch("http://localhost:8080/api/subcategories", {
+      const response = await fetch(`${BASE_URL}/api/subcategories`, {
         method: "POST",
         body: formData,
       });
@@ -91,7 +94,7 @@ const AddSubCategory = () => {
 
   const handleDelete = async (id) => {
     try {
-      await fetch(`http://localhost:8080/api/subcategories/${id}`, {
+      await fetch(`${BASE_URL}/api/subcategories/${id}`, {
         method: "DELETE",
       });
       setSubCategories(subCategories.filter((subCategory) => subCategory._id !== id));
@@ -149,7 +152,7 @@ const AddSubCategory = () => {
 
         <main className="main-content">
           <div className="subcategory-management">
-          <section className="existing-subcategories">
+            <section className="existing-subcategories">
               <h2>Existing Sub Categories</h2>
               <div className="subcategories-table">
                 <table>
@@ -162,39 +165,37 @@ const AddSubCategory = () => {
                       <th>Action</th>
                     </tr>
                   </thead>
-<tbody>
-  {subCategories.map((subCategory, index) => (
-    <tr key={subCategory._id}>
-      <td>{index + 1}</td>
-      <td>{subCategory.name}</td>
-      <td>
-        <img
-          src={subCategory.image || "/placeholder.svg"}
-          alt={subCategory.name}
-          className="table-image"
-        />
-      </td>
-      <td>
-        {
-            subCategory.categoryId.name
-        }
-      </td>
-      <td>
-        <button className="edit-button">Edit</button>
-        <button 
-          className="delete-button"
-          onClick={() => handleDelete(subCategory._id)}
-        >
-          Delete
-        </button>
-      </td>
-    </tr>
-  ))}
-</tbody>
-
+                  <tbody>
+                    {subCategories.map((subCategory, index) => (
+                      <tr key={subCategory._id}>
+                        <td>{index + 1}</td>
+                        <td>{subCategory.name}</td>
+                        <td>
+                          <img
+                            src={subCategory.image || "/placeholder.svg"}
+                            alt={subCategory.name}
+                            className="table-image"
+                          />
+                        </td>
+                        <td>
+                          {subCategory.categoryId.name}
+                        </td>
+                        <td>
+                          <button className="edit-button">Edit</button>
+                          <button
+                            className="delete-button"
+                            onClick={() => handleDelete(subCategory._id)}
+                          >
+                            Delete
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
                 </table>
               </div>
             </section>
+
             <section className="add-subcategory-section">
               <h2>Add New Sub Category</h2>
               <form onSubmit={handleSubmit} className="add-subcategory-form">
@@ -240,8 +241,6 @@ const AddSubCategory = () => {
                 </button>
               </form>
             </section>
-
-            
           </div>
         </main>
       </div>
