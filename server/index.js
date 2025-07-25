@@ -20,18 +20,21 @@ dotenv.config();
 const app = express();
 const server = http.createServer(app);
 
-// ✅ initialize socket.io server
+// === ALLOWED ORIGINS ===
+const allowedOrigins = [
+  "https://blinkify-kj7a.onrender.com", // frontend on Render
+  "http://localhost:5173",              // Vite dev server
+];
+
+// === SOCKET.IO SETUP ===
 const io = new Server(server, {
   cors: {
-    origin: (origin, callback) => {
-      callback(null, origin || "*");
-    },
+    origin: allowedOrigins,
+    methods: ["GET", "POST"],
     credentials: true,
-    methods: ["GET", "POST"]
   },
 });
 
-// ✅ SOCKET.IO event handling
 io.on("connection", (socket) => {
   console.log("Client connected");
 
@@ -45,25 +48,33 @@ io.on("connection", (socket) => {
   });
 });
 
-// Middleware setup
+// === MIDDLEWARE ===
 app.use(express.json());
 app.use(cookieParser());
+
 app.use(
   cors({
-    origin: (origin, callback) => {
-      callback(null, origin || "*");
+    origin: function (origin, callback) {
+      // allow requests with no origin (like mobile apps or curl)
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
     },
     credentials: true,
   })
 );
+
 app.use(morgan("dev"));
+
 app.use(
   helmet({
     crossOriginResourcePolicy: false,
   })
 );
 
-// Routes
+// === ROUTES ===
 app.use('/api/products', productRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/categories', categoryRoutes);
@@ -73,6 +84,7 @@ app.use('/api/orders', orderRoutes);
 
 const PORT = process.env.PORT || 8080;
 
+// === START SERVER ===
 connectDB().then(() => {
   server.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
