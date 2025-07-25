@@ -45,7 +45,7 @@ export default function Checkout() {
       }
   
   
-      const response = await fetch("http://localhost:8080/api/payment/razor", {
+      const response = await fetch("https://deployed-blinkit-backend.onrender.com/api/payment/razor", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
