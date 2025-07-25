@@ -73,7 +73,7 @@ export default function OrderPlaced() {
   
   useEffect(() => {
   if (orderDetails && userDetails) {
-    fetch("http://localhost:8080/api/orders", {
+    fetch("https://deployed-blinkit-backend.onrender.com/api/orders", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
