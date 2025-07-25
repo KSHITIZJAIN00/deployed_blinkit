@@ -8,7 +8,7 @@ const Orders = () => {
   const [orders, setOrders] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:8080/api/orders")
+    fetch("https://deployed-blinkit-backend.onrender.com/api/orders")
       .then((res) => res.json())
       .then((data) => setOrders(data))
       .catch((err) => console.error("Failed to fetch orders:", err));
