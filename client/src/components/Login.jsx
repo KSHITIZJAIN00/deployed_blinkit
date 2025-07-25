@@ -29,18 +29,22 @@ const Login = () => {
     console.log("Response from server:", response.data);
     setMessage(response.data.message);
 
-    if (response.status === 200 && response.data.user) {
-      const { isAdmin, email } = response.data.user;
+  if (response.status === 200 && response.data.user) {
+  const { isAdmin, email } = response.data.user;
 
-      localStorage.setItem("isAdmin", isAdmin);
-      localStorage.setItem("email", email);
+  localStorage.setItem("isAdmin", isAdmin);
+  localStorage.setItem("email", email);
 
-      const username = email.split("@")[0].replace(/[0-9]/g, "").split(/[.\-_]/)[0];
-      localStorage.setItem("username", username);
+  const username = email.split("@")[0].replace(/[0-9]/g, "").split(/[.\-_]/)[0];
+  localStorage.setItem("username", username);
 
-      // FIX: redirect to "/" (home)
-      navigate("/");
-    } else {
+  // IMPORTANT: Mark user as logged in
+  localStorage.setItem("isLoggedIn", "true");
+
+  // Redirect to /home
+  navigate("/home");
+}
+ else {
       setMessage("User data not found in the response");
     }
   } catch (error) {
