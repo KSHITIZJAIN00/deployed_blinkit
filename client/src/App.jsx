@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Login from "./components/Login";
 import Signup from "./components/Signup";
 import Home from "./components/Home";
@@ -19,23 +19,15 @@ function App() {
   return (
     <Router>
       <Routes>
-        {/* Redirect root path */}
-        <Route
-          path="/"
-          element={
-            isLoggedIn ? <Navigate to="/home" /> : <Navigate to="/login" />
-          }
-        />
+        {/* Always show Login page for root (/) */}
+        <Route path="/" element={<Login />} />
 
-        {/* Public routes */}
+        {/* Explicit login route (optional, same as /) */}
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
 
-        {/* Protected home route */}
-        <Route
-          path="/home"
-          element={isLoggedIn ? <Home /> : <Navigate to="/login" />}
-        />
+        {/* After login user will go to /home */}
+        <Route path="/home" element={<Home />} />
 
         {/* Admin Routes */}
         {isAdmin && (
