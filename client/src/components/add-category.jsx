@@ -5,8 +5,11 @@ import cart from "../assets/cart.png";
 import wideAssortment from "../assets/Wide_Assortment.png";
 import "./add-category.css";
 
+// Use deployed backend
+const BASE_URL = "https://deployed-blinkit-backend.onrender.com";
+
 const AddCategory = () => {
-  const isAdmin = localStorage.getItem("isAdmin") === "true"; // or check for role === 'admin'
+  const isAdmin = localStorage.getItem("isAdmin") === "true"; // check for admin role
   const [categories, setCategories] = useState([]);
   const [categoryData, setCategoryData] = useState({
     name: "",
@@ -22,7 +25,7 @@ const AddCategory = () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await fetch("http://localhost:8080/api/categories");
+      const response = await fetch(`${BASE_URL}/api/categories`);
       const data = await response.json();
       console.log("Fetched categories:", data);
       setCategories(data);
@@ -57,7 +60,7 @@ const AddCategory = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetch("http://localhost:8080/api/categories", {
+      const response = await fetch(`${BASE_URL}/api/categories`, {
         method: "POST",
         body: formData,
       });
@@ -81,7 +84,7 @@ const AddCategory = () => {
 
   const handleDelete = async (id) => {
     try {
-      await fetch(`http://localhost:8080/api/categories/${id}`, {
+      await fetch(`${BASE_URL}/api/categories/${id}`, {
         method: "DELETE",
       });
       setCategories(categories.filter((category) => category._id !== id));
@@ -97,18 +100,21 @@ const AddCategory = () => {
         <div className="search-bar">
           <input type="text" placeholder="Search 'groceries'" />
         </div>
-       <div className="header-actions">
-  {!isAdmin && (
-    <button className="cart-button">
-      <img src={cart} alt="Cart" />
-      My Cart
-    </button>
-  )}
-  <Link to="/add" className="add-product-icon">
-    <img src={wideAssortment} alt="Wide Assortment" className="wide-assortment" />
-  </Link>
-</div>
-
+        <div className="header-actions">
+          {!isAdmin && (
+            <button className="cart-button">
+              <img src={cart} alt="Cart" />
+              My Cart
+            </button>
+          )}
+          <Link to="/add" className="add-product-icon">
+            <img
+              src={wideAssortment}
+              alt="Wide Assortment"
+              className="wide-assortment"
+            />
+          </Link>
+        </div>
       </header>
 
       <div className="content">
@@ -131,8 +137,8 @@ const AddCategory = () => {
                 <Link to="/add-subcategory">Add SubCategory</Link>
               </li>
               <li>
-                  <Link to="/orders">Orders</Link>
-            </li>
+                <Link to="/orders">Orders</Link>
+              </li>
               <li>
                 <Link to="/login">Profile</Link>
               </li>
