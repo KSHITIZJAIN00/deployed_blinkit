@@ -43,13 +43,13 @@ const AddProduct = () => {
     const formData = new FormData();
     formData.append("name", productData.name);
     formData.append("description", productData.description);
-    formData.append("price", productData.price); // Ensure price is appended
+    formData.append("price", productData.price); 
     formData.append("image", productData.image);
   
     setIsLoading(true);
   
     try {
-      const response = await fetch("http://localhost:8080/api/products/add", {
+      const response = await fetch("https://deployed-blinkit-backend.onrender.com/api/products/add", {
         method: "POST",
         body: formData,
       });
@@ -57,10 +57,7 @@ const AddProduct = () => {
       if (response.ok) {
         const data = await response.json();
         
-        // Show the blob with success message
         setShowAlert(true);
-  
-        // Optionally hide the alert after 3 seconds
         setTimeout(() => {
           setShowAlert(false);
         }, 3000);
@@ -170,7 +167,6 @@ const AddProduct = () => {
     </div>
     
   );
-  
 };
 
 export default AddProduct;
