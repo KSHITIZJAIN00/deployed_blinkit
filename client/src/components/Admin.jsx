@@ -6,7 +6,7 @@ const Admin = () => {
 
   const handleAddCategory = async () => {
     try {
-      const response = await fetch("http://localhost:8080/api/categories", {  // Corrected the URL here
+     fetch("https://deployed-blinkit-backend.onrender.com/api/categories", { // Corrected the URL here
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, image }),
