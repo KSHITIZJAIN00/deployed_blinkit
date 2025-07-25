@@ -23,10 +23,14 @@ const server = http.createServer(app); // ✅ wrap app in HTTP server
 // ✅ initialize socket.io server
 const io = new Server(server, {
   cors: {
-    origin: ["http://localhost:5173", "http://localhost:5174"],
-    methods: ["GET", "POST"],
+    origin: (origin, callback) => {
+      callback(null, origin || "*");
+    },
+    credentials: true,
+    methods: ["GET", "POST"]
   },
 });
+
 
 // ✅ SOCKET.IO event handling
 io.on("connection", (socket) => {
