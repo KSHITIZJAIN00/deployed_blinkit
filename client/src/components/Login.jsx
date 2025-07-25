@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import "./login.css";  // lowercase
+import "./login.css";
 import logo from "../assets/blinkit-logo.png";
 import cart from "../assets/cart.png";
 
@@ -18,43 +18,51 @@ const Login = () => {
     };
   }, []);
 
- const handleSubmit = async (e) => {
-  e.preventDefault();
-  try {
-    const response = await axios.post(
-      "https://deployed-blinkit-backend.onrender.com/api/auth/login",
-      { email, password }
-    );
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-    console.log("Response from server:", response.data);
-    setMessage(response.data.message);
+    // Clear any old session data
+    localStorage.removeItem("isLoggedIn");
+    localStorage.removeItem("isAdmin");
+    localStorage.removeItem("email");
+    localStorage.removeItem("username");
 
-  if (response.status === 200 && response.data.user) {
-  const { isAdmin, email } = response.data.user;
+    try {
+      const response = await axios.post(
+        "https://deployed-blinkit-backend.onrender.com/api/auth/login",
+        { email, password }
+      );
 
-  localStorage.setItem("isAdmin", isAdmin);
-  localStorage.setItem("email", email);
+      console.log("Response from server:", response.data);
+      setMessage(response.data.message);
 
-  const username = email.split("@")[0].replace(/[0-9]/g, "").split(/[.\-_]/)[0];
-  localStorage.setItem("username", username);
+      if (response.status === 200 && response.data.user) {
+        const { isAdmin, email } = response.data.user;
 
-  // IMPORTANT: Mark user as logged in
-  localStorage.setItem("isLoggedIn", "true");
+        // Save data to localStorage
+        localStorage.setItem("isAdmin", isAdmin);
+        localStorage.setItem("email", email);
 
-  // Redirect to /home
-  navigate("/home");
-}
- else {
-      setMessage("User data not found in the response");
+        const username = email
+          .split("@")[0]
+          .replace(/[0-9]/g, "")
+          .split(/[.\-_]/)[0];
+        localStorage.setItem("username", username);
+
+        // Mark user as logged in
+        localStorage.setItem("isLoggedIn", "true");
+
+        // Redirect to /home
+        navigate("/home");
+      } else {
+        setMessage("User data not found in the response");
+      }
+    } catch (error) {
+      console.error("Error during login:", error);
+      setMessage(error.response?.data?.message || "An error occurred");
     }
-  } catch (error) {
-    console.error("Error during login:", error);
-    setMessage(error.response?.data?.message || "An error occurred");
-  }
-};
+  };
 
-
-  
   return (
     <div className="login-page">
       <header className="header">
@@ -78,6 +86,7 @@ const Login = () => {
               placeholder="Enter your email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              required
             />
           </div>
           <div className="input-group">
@@ -88,9 +97,12 @@ const Login = () => {
               placeholder="Enter your password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              required
             />
           </div>
-          <button className="login-button">Login</button>
+          <button className="login-button" type="submit">
+            Login
+          </button>
         </form>
         <p>{message}</p>
         <p>
@@ -102,3 +114,4 @@ const Login = () => {
 };
 
 export default Login;
+
