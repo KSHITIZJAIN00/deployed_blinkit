@@ -21,10 +21,10 @@ const Login = () => {
  const handleSubmit = async (e) => {
   e.preventDefault();
   try {
-    const response = await axios.post("https://deployed-blinkit-backend.onrender.com/api/auth/login", {
-      email,
-      password,
-    });
+    const response = await axios.post(
+      "https://deployed-blinkit-backend.onrender.com/api/auth/login",
+      { email, password }
+    );
 
     console.log("Response from server:", response.data);
     setMessage(response.data.message);
@@ -32,16 +32,14 @@ const Login = () => {
     if (response.status === 200 && response.data.user) {
       const { isAdmin, email } = response.data.user;
 
-      // Save to localStorage
       localStorage.setItem("isAdmin", isAdmin);
       localStorage.setItem("email", email);
 
-      // Extract and save username
       const username = email.split("@")[0].replace(/[0-9]/g, "").split(/[.\-_]/)[0];
       localStorage.setItem("username", username);
 
-      // Redirect
-      navigate("/home");
+      // FIX: redirect to "/" (home)
+      navigate("/");
     } else {
       setMessage("User data not found in the response");
     }
@@ -50,6 +48,7 @@ const Login = () => {
     setMessage(error.response?.data?.message || "An error occurred");
   }
 };
+
 
   
   return (
