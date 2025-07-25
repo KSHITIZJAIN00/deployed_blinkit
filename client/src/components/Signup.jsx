@@ -1,6 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useEffect } from 'react';
 import axios from "axios";
 import "./Login.css";
 import logo from "../assets/blinkit-logo.png";
@@ -13,7 +12,7 @@ const Signup = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [message, setMessage] = useState("");
 
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -24,22 +23,26 @@ const Signup = () => {
     }
 
     try {
-      const response = await axios.post("http://localhost:8080/api/auth/signup", {
-        username,
-        email,
-        password,
-      });
+      const response = await axios.post(
+        "https://deployed-blinkit-backend.onrender.com/api/auth/signup",
+        {
+          username,
+          email,
+          password,
+        }
+      );
 
       setMessage(response.data.message || "Signup successful!");
-      
+
       if (response.status === 201 || response.data.success) {
         localStorage.setItem("username", username);
-        setTimeout(() => navigate("/login"), 500); 
+        setTimeout(() => navigate("/login"), 500);
       }
     } catch (error) {
       setMessage(error.response?.data?.message || "An error occurred");
     }
   };
+
   useEffect(() => {
     document.body.classList.add("login-signup");
     return () => {
