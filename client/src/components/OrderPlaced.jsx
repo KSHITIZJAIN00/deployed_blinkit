@@ -96,7 +96,7 @@ export default function OrderPlaced() {
   const handleTrackOrder = () => {
     if (orderDetails && orderDetails.orderId) {
       // Use correct route
-      navigate(`/track-order/${orderDetails.orderId}`);
+      navigate(`/track-order/123`);
     } else {
       console.error("Order ID is missing");
     }
