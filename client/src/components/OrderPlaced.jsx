@@ -94,12 +94,7 @@ export default function OrderPlaced() {
   }, [cart]);
 
   const handleTrackOrder = () => {
-    if (orderDetails && orderDetails.orderId) {
-      // Use correct route
       navigate(`/track-order/123`);
-    } else {
-      console.error("Order ID is missing");
-    }
   };
 
   const downloadInvoice = () => {
