@@ -1,16 +1,16 @@
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import Login from "./componets/Login";
-import Signup from "./componets/Signup";
-import Home from "./componets/Home";
-import Admin from "./componets/Admin";
-import AddProduct from "./componets/AddProduct";
-import AddCategory from "./componets/add-category";
-import AddSubCategory from "./componets/add-sub";
-import Cheak from "./componets/cheakout";
-import Order from "./componets/OrderPlaced";
-import TrackOrder from "./componets/TrackOrder";
-import Orders from "./componets/Orders";
-import CategoryPage from "./componets/CategoryPage"; // ✅ NEW IMPORT
+import Login from "./components/Login";
+import Signup from "./components/Signup";
+import Home from "./components/Home";
+import Admin from "./components/Admin";
+import AddProduct from "./components/AddProduct";
+import AddCategory from "./components/add-category";
+import AddSubCategory from "./components/add-sub";
+import Cheak from "./components/cheakout";
+import Order from "./components/OrderPlaced";
+import TrackOrder from "./components/TrackOrder";
+import Orders from "./components/Orders";
+import CategoryPage from "./components/CategoryPage"; // ✅ NEW IMPORT
 
 import "./App.css";
 import { useState } from "react";
