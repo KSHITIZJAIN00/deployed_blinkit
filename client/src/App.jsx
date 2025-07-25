@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom";
 import Login from "./components/Login";
 import Signup from "./components/Signup";
 import Home from "./components/Home";
@@ -13,17 +13,22 @@ import TrackOrder from "./components/TrackOrder";
 import "./App.css";
 
 function App() {
-  // Check if the user is an admin (You may want to fetch this from localStorage or user context)
   const isAdmin = localStorage.getItem("isAdmin") === "true";
+  const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
 
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Home />} />
+        {/* Default route: If not logged in, go to login */}
+        <Route path="/" element={isLoggedIn ? <Navigate to="/home" /> : <Navigate to="/login" />} />
+
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
 
-        {/* Admin Routes (only accessible if the user is an admin) */}
+        {/* Protected home route */}
+        <Route path="/home" element={isLoggedIn ? <Home /> : <Navigate to="/login" />} />
+
+        {/* Admin Routes (only accessible if admin) */}
         {isAdmin && (
           <>
             <Route path="/admin" element={<Admin />} />
@@ -32,8 +37,10 @@ function App() {
             <Route path="/add-subcategory" element={<AddSubCategory />} />
           </>
         )}
+
+        {/* Other routes */}
         <Route path="/track-order/:orderId" element={<TrackOrder />} />
-        <Route path="/checkout" element={<Cheak />} /> {/* Fixed typo here */}
+        <Route path="/checkout" element={<Cheak />} />
         <Route path="/order" element={<Order />} />
       </Routes>
     </Router>
@@ -41,3 +48,4 @@ function App() {
 }
 
 export default App;
+
