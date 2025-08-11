@@ -168,7 +168,7 @@ const Login = () => {
       setMessage(res.data.message);
 
       // Navigate after successful login
-      setTimeout(() => navigate("/"), 1000);
+      setTimeout(() => navigate("/home"), 1000);
     } catch (err) {
       setMessage(err.response?.data?.message || "OTP verification failed");
     }
