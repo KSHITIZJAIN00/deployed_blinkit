@@ -83,6 +83,9 @@ app.use('/api/payment', paymentRoutes);
 app.use('/api/orders', orderRoutes);
 
 const PORT = process.env.PORT || 8080;
+app.get('/health', (req, res) => {
+  res.send('API is running');
+});
 
 // === START SERVER ===
 connectDB().then(() => {
