@@ -115,7 +115,6 @@
 
 // export default Login;
 
-
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
@@ -124,11 +123,13 @@ import logo from "../assets/blinkit-logo.png";
 import cart from "../assets/cart.png";
 
 const Login = () => {
-  const [step, setStep] = useState(1); // 1 = Login, 2 = OTP
+  const [step, setStep] = useState(1); // Step 1: Login, Step 2: OTP
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [otp, setOtp] = useState("");
   const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -138,27 +139,34 @@ const Login = () => {
     };
   }, []);
 
-  // STEP 1: Login → Send OTP
+  // Step 1: Send login request & get OTP
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
+    setMessage("");
+    setLoading(true);
 
     try {
       const res = await axios.post(
         "https://deployed-blinkit-backend.onrender.com/api/auth/login",
         { email, password }
       );
-      setMessage(res.data.message);
+
       if (res.status === 200) {
-        setStep(2); // Move to OTP step
+        setMessage(res.data.message || "OTP sent to your email.");
+        setStep(2);
       }
     } catch (err) {
       setMessage(err.response?.data?.message || "Error logging in");
+    } finally {
+      setLoading(false);
     }
   };
 
-  // STEP 2: Verify OTP
+  // Step 2: Verify OTP
   const handleOtpSubmit = async (e) => {
     e.preventDefault();
+    setMessage("");
+    setLoading(true);
 
     try {
       const res = await axios.post(
@@ -173,6 +181,7 @@ const Login = () => {
         localStorage.setItem("email", userEmail);
         localStorage.setItem("isLoggedIn", "true");
 
+        // Create username without numbers & split special chars
         const username = userEmail
           .split("@")[0]
           .replace(/[0-9]/g, "")
@@ -181,10 +190,12 @@ const Login = () => {
 
         navigate("/home");
       } else {
-        setMessage("Invalid OTP response");
+        setMessage("Invalid OTP. Please try again.");
       }
     } catch (err) {
       setMessage(err.response?.data?.message || "OTP verification failed");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -202,7 +213,7 @@ const Login = () => {
         </button>
       </header>
 
-      {/* Login Container */}
+      {/* Login / OTP Container */}
       <div className="login-container">
         {step === 1 ? (
           <>
@@ -230,11 +241,11 @@ const Login = () => {
                   required
                 />
               </div>
-              <button className="login-button" type="submit">
-                Send OTP
+              <button className="login-button" type="submit" disabled={loading}>
+                {loading ? "Sending..." : "Send OTP"}
               </button>
             </form>
-            <p>{message}</p>
+            {message && <p className="status-message">{message}</p>}
             <p>
               Don't have an account? <Link to="/signup">Sign up</Link>
             </p>
@@ -254,14 +265,15 @@ const Login = () => {
                   required
                 />
               </div>
-              <button className="login-button" type="submit">
-                Verify OTP
+              <button className="login-button" type="submit" disabled={loading}>
+                {loading ? "Verifying..." : "Verify OTP"}
               </button>
             </form>
-            <p>{message}</p>
+            {message && <p className="status-message">{message}</p>}
             <p>
               Didn't get OTP?{" "}
               <button
+                type="button"
                 onClick={() => {
                   setStep(1);
                   setMessage("");
