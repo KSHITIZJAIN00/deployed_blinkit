@@ -114,7 +114,6 @@
 // };
 
 // export default Login;
-
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
@@ -123,9 +122,8 @@ import logo from "../assets/blinkit-logo.png";
 import cart from "../assets/cart.png";
 
 const Login = () => {
-  const [step, setStep] = useState(1); // Step 1: Login, Step 2: OTP
+  const [step, setStep] = useState(1); // 1 = email input, 2 = OTP input
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [otp, setOtp] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
@@ -139,7 +137,7 @@ const Login = () => {
     };
   }, []);
 
-  // Step 1: Send login request & get OTP
+  // Step 1: Request OTP
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
     setMessage("");
@@ -148,7 +146,7 @@ const Login = () => {
     try {
       const res = await axios.post(
         "https://deployed-blinkit-backend.onrender.com/api/auth/login",
-        { email, password }
+        { email }
       );
 
       if (res.status === 200) {
@@ -181,7 +179,7 @@ const Login = () => {
         localStorage.setItem("email", userEmail);
         localStorage.setItem("isLoggedIn", "true");
 
-        // Create username without numbers & split special chars
+        // Create display name from email (remove numbers & split at special chars)
         const username = userEmail
           .split("@")[0]
           .replace(/[0-9]/g, "")
@@ -227,17 +225,6 @@ const Login = () => {
                   placeholder="Enter your email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  required
-                />
-              </div>
-              <div className="input-group">
-                <label htmlFor="password">Password:</label>
-                <input
-                  type="password"
-                  id="password"
-                  placeholder="Enter your password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
                   required
                 />
               </div>
@@ -290,4 +277,3 @@ const Login = () => {
 };
 
 export default Login;
-
