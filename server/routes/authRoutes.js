@@ -66,7 +66,6 @@
 
 
 // export default router;
-
 import express from "express";
 import bcrypt from "bcryptjs";
 import nodemailer from "nodemailer";
@@ -75,9 +74,9 @@ import User from "../models/User.js";
 const router = express.Router();
 let otpStore = {}; // Temporary store
 
-// ✅ Hardcoded email credentials
-const EMAIL_USER = "kshitizagrawal001@gmail.com"; 
-const EMAIL_PASS = "xisp zcgl ktze zfgp"; // Gmail App Password
+// Use environment variables for security (replace with actual env vars in production)
+const EMAIL_USER =  "kshitizagrawal001@gmail.com";
+const EMAIL_PASS =  "xisp zcgl ktze zfgp";
 
 // Nodemailer config
 const transporter = nodemailer.createTransport({
@@ -94,16 +93,21 @@ router.post("/login", async (req, res) => {
 
   try {
     const user = await User.findOne({ email });
-    if (!user) return res.status(404).json({ message: "User not found" });
+    if (!user) {
+      console.log(`Login failed: User not found: ${email}`);
+      return res.status(404).json({ message: "User not found" });
+    }
 
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(400).json({ message: "Invalid credentials" });
+    if (!isMatch) {
+      console.log(`Login failed: Invalid credentials for ${email}`);
+      return res.status(400).json({ message: "Invalid credentials" });
+    }
 
     // Generate OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     otpStore[email] = otp;
 
-    // Styled HTML email
     const htmlTemplate = `
       <div style="font-family: Arial, sans-serif; background-color: #f6f6f6; padding: 30px;">
         <div style="max-width: 500px; margin: auto; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
@@ -128,20 +132,24 @@ router.post("/login", async (req, res) => {
       </div>
     `;
 
-    // Send HTML OTP email
-    await transporter.sendMail({
-      from: `"Blinkify" <${EMAIL_USER}>`,
-      to: email,
-      subject: "Your Login OTP",
-      html: htmlTemplate,
-    });
+    try {
+      await transporter.sendMail({
+        from: `"Blinkify" <${EMAIL_USER}>`,
+        to: email,
+        subject: "Your Login OTP",
+        html: htmlTemplate,
+      });
+      console.log(`OTP sent to ${email}: ${otp}`);
+    } catch (mailError) {
+      console.error("Failed to send OTP email:", mailError);
+      return res.status(500).json({ message: "Failed to send OTP email" });
+    }
 
-    // Expire OTP after 5 min
     setTimeout(() => delete otpStore[email], 5 * 60 * 1000);
 
     res.status(200).json({ message: "OTP sent to email", email });
   } catch (error) {
-    console.error(error);
+    console.error("Login route error:", error);
     res.status(500).json({ message: "Internal server error", error });
   }
 });
@@ -166,13 +174,9 @@ router.post("/verify-otp", async (req, res) => {
       },
     });
   } catch (error) {
+    console.error("Verify OTP route error:", error);
     res.status(500).json({ message: "Internal server error", error });
   }
 });
 
 export default router;
-
-
-
-
-
