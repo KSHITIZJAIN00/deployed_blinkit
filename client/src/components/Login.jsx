@@ -115,18 +115,17 @@
 
 // export default Login;
 
-
-
-
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import "./login.css";
 import logo from "../assets/blinkit-logo.png";
 import cart from "../assets/cart.png";
 
+const BACKEND_URL = "https://deployed-blinkit-backend.onrender.com"; // your deployed backend URL here
+
 const Login = () => {
-  const [step, setStep] = useState(1); // 1 = login, 2 = OTP
+  const [step, setStep] = useState(1); // 1=login form, 2=OTP form
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [otp, setOtp] = useState("");
@@ -135,43 +134,41 @@ const Login = () => {
 
   useEffect(() => {
     document.body.classList.add("login-signup");
-    return () => {
-      document.body.classList.remove("login-signup");
-    };
+    return () => document.body.classList.remove("login-signup");
   }, []);
 
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
+    setMessage("");
     try {
       const res = await axios.post(
-        "https://deployed-blinkit-backend.onrender.com/api/auth/login",
+        `${BACKEND_URL}/api/auth/login`,
         { email, password }
       );
       setMessage(res.data.message);
       setStep(2);
     } catch (err) {
-      setMessage(err.response?.data?.message || "Error logging in");
+      setMessage(err.response?.data?.message || "Login failed");
     }
   };
 
   const handleOtpSubmit = async (e) => {
     e.preventDefault();
+    setMessage("");
     try {
       const res = await axios.post(
-        "https://deployed-blinkit-backend.onrender.com/api/auth/verify-otp",
+        `${BACKEND_URL}/api/auth/verify-otp`,
         { email, otp }
       );
 
-      localStorage.setItem("isAdmin", res.data.user.isAdmin);
+      // Save user data to localStorage
       localStorage.setItem("email", res.data.user.email);
+      localStorage.setItem("isAdmin", res.data.user.isAdmin);
 
-      const username = res.data.user.email
-        .split("@")[0]
-        .replace(/[0-9]/g, "")
-        .split(/[.\-_]/)[0];
-      localStorage.setItem("username", username);
+      setMessage(res.data.message);
 
-      navigate("/");
+      // Navigate after successful login
+      setTimeout(() => navigate("/"), 1000);
     } catch (err) {
       setMessage(err.response?.data?.message || "OTP verification failed");
     }
@@ -179,7 +176,6 @@ const Login = () => {
 
   return (
     <div className="login-page">
-      {/* Header */}
       <header className="header">
         <img src={logo} alt="Logo" className="logo" />
         <div className="search-bar">
@@ -191,7 +187,6 @@ const Login = () => {
         </button>
       </header>
 
-      {/* Login/OTP Container */}
       <div className="login-container">
         {step === 1 ? (
           <>
@@ -202,9 +197,10 @@ const Login = () => {
                 <input
                   type="email"
                   id="email"
-                  placeholder="Enter your email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  required
+                  placeholder="Enter your email"
                 />
               </div>
               <div className="input-group">
@@ -212,16 +208,19 @@ const Login = () => {
                 <input
                   type="password"
                   id="password"
-                  placeholder="Enter your password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
+                  required
+                  placeholder="Enter your password"
                 />
               </div>
-              <button className="login-button">Send OTP</button>
+              <button type="submit" className="login-button">
+                Send OTP
+              </button>
             </form>
             <p>{message}</p>
             <p>
-              Don't have an account? <a href="/signup">Sign up</a>
+              Don't have an account? <Link to="/signup">Sign up</Link>
             </p>
           </>
         ) : (
@@ -233,16 +232,22 @@ const Login = () => {
                 <input
                   type="text"
                   id="otp"
-                  placeholder="Enter OTP"
                   value={otp}
                   onChange={(e) => setOtp(e.target.value)}
+                  required
+                  placeholder="Enter OTP"
                 />
               </div>
-              <button className="login-button">Verify OTP</button>
+              <button type="submit" className="login-button">
+                Verify OTP
+              </button>
             </form>
             <p>{message}</p>
             <p>
-              Didn't get OTP? <button onClick={() => setStep(1)}>Resend</button>
+              Didn't get OTP?{" "}
+              <button onClick={() => setStep(1)} className="resend-button">
+                Resend
+              </button>
             </p>
           </>
         )}
