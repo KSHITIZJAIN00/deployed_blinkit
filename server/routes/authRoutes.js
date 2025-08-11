@@ -67,113 +67,112 @@
 
 // export default router;
 
-// routes/authRoutes.js
 import express from "express";
-import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
+import bcrypt from "bcrypt";
 import nodemailer from "nodemailer";
 import User from "../models/User.js";
 
 const router = express.Router();
+let otpStore = {}; // Temporary store
 
-// Nodemailer transporter setup with your Gmail account
+// ✅ Hardcoded email credentials
+const EMAIL_USER = "kshitizagrawal001@gmail.com"; 
+const EMAIL_PASS = "xisp zcgl ktze zfgp"; // Gmail App Password
+
+// Nodemailer config
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
-    user: "kshitizagrawal001@gmail.com",
-    pass: "xisp zcgl ktze zfgp", // ⚠️ Use App Password from Google
+    user: EMAIL_USER,
+    pass: EMAIL_PASS,
   },
 });
 
-// Signup route
-router.post("/signup", async (req, res) => {
+// STEP 1: Login and send OTP
+router.post("/login", async (req, res) => {
+  const { email, password } = req.body;
+
   try {
-    const { name, email, password, isAdmin } = req.body;
+    const user = await User.findOne({ email });
+    if (!user) return res.status(404).json({ message: "User not found" });
 
-    // Check if user already exists
-    let user = await User.findOne({ email });
-    if (user) {
-      return res.status(400).json({ message: "User already exists" });
-    }
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) return res.status(400).json({ message: "Invalid credentials" });
 
-    // Hash password
-    const hashedPassword = await bcrypt.hash(password, 10);
+    // Generate OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    otpStore[email] = otp;
 
-    // Create new user
-    user = new User({
-      name,
-      email,
-      password: hashedPassword,
-      isAdmin: isAdmin || false,
-    });
-    await user.save();
-
-    // Send welcome email
+    // Styled HTML email
     const htmlTemplate = `
       <div style="font-family: Arial, sans-serif; background-color: #f6f6f6; padding: 30px;">
         <div style="max-width: 500px; margin: auto; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
           <div style="background-color: #FFE600; padding: 15px; text-align: center;">
-            <h2 style="margin: 0; color: #333;">🎉 Welcome to Our Platform</h2>
+            <h2 style="margin: 0; color: #333;">🔐 Login Verification</h2>
           </div>
           <div style="padding: 20px; text-align: center;">
             <p style="font-size: 16px; color: #555;">
-              Hello <strong>${name}</strong>,  
-              Thank you for signing up! We’re excited to have you onboard.
+              Hello <strong>${user.name || "User"}</strong>,  
+              Use the following OTP to complete your login:
             </p>
-            <p style="font-size: 14px; color: #999;">You can now log in using your email and password.</p>
+            <h1 style="font-size: 36px; color: #000; margin: 20px 0;">${otp}</h1>
+            <p style="font-size: 14px; color: #999;">This OTP will expire in <strong>5 minutes</strong>.</p>
             <div style="margin-top: 30px;">
-              <a href="${process.env.FRONTEND_URI || "http://localhost:5174"}" style="text-decoration: none; background-color: #FFE600; padding: 10px 20px; border-radius: 5px; color: black; font-weight: bold;">Go to Login</a>
+              <a href="https://blinkify-kj7a.onrender.com" style="text-decoration: none; background-color: #FFE600; padding: 10px 20px; border-radius: 5px; color: black; font-weight: bold;">Go to Login</a>
             </div>
           </div>
           <div style="background-color: #f1f1f1; padding: 10px; text-align: center; font-size: 12px; color: #777;">
-            © ${new Date().getFullYear()} Your Company. All rights reserved.
+            © ${new Date().getFullYear()} Blinkify. All rights reserved.
           </div>
         </div>
       </div>
     `;
 
+    // Send HTML OTP email
     await transporter.sendMail({
-      from: `"Our Platform" <kshitizagrawal001@gmail.com>`,
+      from: `"Blinkify" <${EMAIL_USER}>`,
       to: email,
-      subject: "Welcome to Our Platform 🎉",
+      subject: "Your Login OTP",
       html: htmlTemplate,
     });
 
-    res.status(201).json({ message: "User registered successfully!" });
+    // Expire OTP after 5 min
+    setTimeout(() => delete otpStore[email], 5 * 60 * 1000);
+
+    res.status(200).json({ message: "OTP sent to email", email });
   } catch (error) {
-    console.error("Signup error:", error);
-    res.status(500).json({ message: "Server error" });
+    console.error(error);
+    res.status(500).json({ message: "Internal server error", error });
   }
 });
 
-// Login route
-router.post("/login", async (req, res) => {
+// STEP 2: Verify OTP
+router.post("/verify-otp", async (req, res) => {
+  const { email, otp } = req.body;
+
   try {
-    const { email, password } = req.body;
+    if (!otpStore[email] || otpStore[email] !== otp) {
+      return res.status(400).json({ message: "Invalid or expired OTP" });
+    }
 
-    // Check user existence
+    delete otpStore[email];
     const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(400).json({ message: "Invalid credentials" });
-    }
 
-    // Check password
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return res.status(400).json({ message: "Invalid credentials" });
-    }
-
-    // Create token
-    const token = jwt.sign({ id: user._id, isAdmin: user.isAdmin }, "jwtsecretkey", {
-      expiresIn: "7d",
+    res.status(200).json({
+      message: "OTP verified, login successful",
+      user: {
+        email: user.email,
+        isAdmin: user.isAdmin,
+      },
     });
-
-    res.json({ token, user });
   } catch (error) {
-    console.error("Login error:", error);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: "Internal server error", error });
   }
 });
 
 export default router;
+
+
+
+
 
