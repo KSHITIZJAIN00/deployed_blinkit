@@ -67,9 +67,9 @@
 
 // export default router;
 
-
+// routes/authRoutes.js
 import express from "express";
-import bcrypt from "bcryptjs"; // ✅ use bcryptjs instead of bcrypt
+import bcrypt from "bcryptjs";
 import nodemailer from "nodemailer";
 import User from "../models/User.js";
 
@@ -77,9 +77,9 @@ const router = express.Router();
 
 let otpStore = {}; // Temporary OTP store
 
-// ✅ Email credentials (move to env in production)
-const EMAIL_USER = "kshitizagrawal001@gmail.com";
-const EMAIL_PASS = "xisp zcgl ktze zfgp";
+// ✅ Email credentials (use environment variables in production)
+const EMAIL_USER = process.env.EMAIL_USER || "your-email@gmail.com";
+const EMAIL_PASS = process.env.EMAIL_PASS || "your-app-password";
 
 // Nodemailer config
 const transporter = nodemailer.createTransport({
@@ -96,14 +96,10 @@ router.post("/login", async (req, res) => {
 
   try {
     const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
+    if (!user) return res.status(404).json({ message: "User not found" });
 
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return res.status(400).json({ message: "Invalid credentials" });
-    }
+    if (!isMatch) return res.status(400).json({ message: "Invalid credentials" });
 
     // Generate OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
@@ -145,17 +141,13 @@ router.post("/login", async (req, res) => {
     // Expire OTP after 5 minutes
     setTimeout(() => delete otpStore[email], 5 * 60 * 1000);
 
-    // ✅ Consistent deployed-style response
-    res.status(200).json({ 
-      message: "OTP sent to email", 
-      user: { 
-        email: user.email, 
-        isAdmin: user.isAdmin 
-      } 
+    res.status(200).json({
+      message: "OTP sent to email",
+      user: { email: user.email, isAdmin: user.isAdmin }
     });
 
   } catch (error) {
-    console.error(error);
+    console.error("Login error:", error);
     res.status(500).json({ message: "Internal server error", error });
   }
 });
@@ -170,18 +162,15 @@ router.post("/verify-otp", async (req, res) => {
     }
 
     delete otpStore[email];
-
     const user = await User.findOne({ email });
 
     res.status(200).json({
       message: "OTP verified, login successful",
-      user: {
-        email: user.email,
-        isAdmin: user.isAdmin,
-      },
+      user: { email: user.email, isAdmin: user.isAdmin }
     });
 
   } catch (error) {
+    console.error("Verify OTP error:", error);
     res.status(500).json({ message: "Internal server error", error });
   }
 });
