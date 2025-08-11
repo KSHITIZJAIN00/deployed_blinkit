@@ -179,4 +179,32 @@ router.post("/verify-otp", async (req, res) => {
   }
 });
 
+// Signup Route
+router.post("/signup", async (req, res) => {
+  const { email, password, isAdmin } = req.body;
+
+  try {
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ message: "User already exists" });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const newUser = new User({
+      email,
+      password: hashedPassword,
+      isAdmin: isAdmin || false,
+    });
+
+    await newUser.save();
+
+    res.status(201).json({ message: "User registered successfully" });
+  } catch (error) {
+    console.error("Signup route error:", error);
+    res.status(500).json({ message: "Internal server error", error });
+  }
+});
+
+
 export default router;
