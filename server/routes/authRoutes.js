@@ -77,19 +77,21 @@ import User from "../models/User.js";
 
 const router = express.Router();
 
-let otpStore = {}; // Temporary in-memory OTP store (use Redis or DB for prod)
+let otpStore = {}; // Temporary in-memory OTP store (use Redis/DB for production)
 
-// Use environment variables or fallback (replace with your env vars)
 const EMAIL_USER = "kshitizagrawal001@gmail.com";
 const EMAIL_PASS = "xisp zcgl ktze zfgp";
 
-// Nodemailer setup
+// Nodemailer setup with pooling for faster sending
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
     user: EMAIL_USER,
     pass: EMAIL_PASS,
   },
+  pool: true,          // Enable connection pooling
+  maxConnections: 5,   // Max simultaneous connections
+  maxMessages: 100,    // Max messages per connection before reconnect
 });
 
 // --- Signup Route ---
@@ -154,17 +156,22 @@ router.post("/login", async (req, res) => {
       </div>
     `;
 
-    await transporter.sendMail({
+    // Respond immediately so user doesn't wait for email sending
+    res.status(200).json({ message: "OTP sent to email", email });
+
+    // Send email async, no blocking
+    transporter.sendMail({
       from: `"Your App" <${EMAIL_USER}>`,
       to: email,
       subject: "Your Login OTP",
       html: htmlTemplate,
-    });
+    })
+    .then(info => console.log("OTP email sent:", info.messageId))
+    .catch(err => console.error("Error sending OTP email:", err));
 
     // Auto delete OTP after 5 minutes
     setTimeout(() => delete otpStore[email], 5 * 60 * 1000);
 
-    res.status(200).json({ message: "OTP sent to email", email });
   } catch (error) {
     console.error("Login error:", error);
     res.status(500).json({ message: "Internal server error" });
